@@ -1,0 +1,4 @@
+
+EllucianEthosPythonClient==0.2.25
+InquirerPy==0.3.4
+
