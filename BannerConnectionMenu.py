@@ -6,6 +6,7 @@ import EllucianBannerPythonClient
 import PythonAPIClientBase
 import os
 import copy
+from BannerApi.BannerLoggedInMenu import LoggedInMenu
 
 CONNECITON_FILE_NAME = "_local_banner_connections.json"
 
@@ -130,9 +131,6 @@ class BannerConnectionMenu():
 
         print("Login session established")
 
-        print("TODO")
-
-        return True
-        # loggedInMenu = LoggedInMenu.LoggedInMenu(ethosClient, loginSession, connection_name)
-        # return loggedInMenu.run()
+        loggedInMenu = LoggedInMenu(bannerClient, loginSession, connection_name)
+        return loggedInMenu.run()
 
