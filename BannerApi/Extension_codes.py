@@ -22,6 +22,7 @@ class ExtensionCodesMenu():
     def run(self):
         operations = {
             "View Extension Codes": self.opt_view_extension_codes,
+            "Create Extension Code": self.opt_create_extension_codes,
             "Delete Extension Code": self.opt_del_extension_codes
         }
         operation_list = []
@@ -73,9 +74,38 @@ class ExtensionCodesMenu():
             headers["Content-Type"] = "application/json"
             headers["Accept"] = "application/json"
 
-        response = self.bannerClient.sendDeleteRequest(url=base_url, loginSession=self.loginSession, injectHeadersFn=injectHeaders)
+        response = self.bannerClient.sendDeleteRequest(url= base_url + "/" + str(selected_code), loginSession=self.loginSession, injectHeadersFn=injectHeaders)
         if response.status_code != 200:
             print("There was an error deleting def with is " + str(selected_code) + ":", response.text, response.status_code)
         else:
             print("Delete successful: ", response.text)
+        return True
+
+    def opt_create_extension_codes(self):
+        code_default_name = "opt_create_extension_codes_code"
+        code = inquirer.text(
+            message="Extension Code Name:",
+            default=self.commonDefaults.get_default_string_value(code_default_name, "RJM_TRAINING_EXTENSIONS")
+        ).execute()
+
+        post_data = {
+            "code": code,
+            "description": "Code added as part of training"
+        }
+        def injectHeaders(headers):
+            headers["Content-Type"] = "application/json"
+            headers["Accept"] = "application/json"
+
+        response = self.bannerClient.sendPostRequest(
+            url=base_url,
+            loginSession=self.loginSession,
+            injectHeadersFn=injectHeaders,
+            data=json.dumps(post_data)
+        )
+        if response.status_code != 201:
+            print("There was an error creating def:", response.text, response.status_code)
+        else:
+            self.commonDefaults.set_default_string_value(code_default_name, code)
+            print("Create successful: ", response.text)
+
         return True

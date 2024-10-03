@@ -49,3 +49,22 @@ class ExtensionDefsMenu():
         print("TODO")
 
 
+        # print("Not implemented")
+        # my_extension_code = "RJM_TRAINING_EXTENSIONS"
+        # jsonLabel = "RJM_extraData"
+        # sqlReadRuleCode = "RJM_EXTRA_DATA"
+        # columnName = "RJM_EXTRA_DATA"
+        # resourceName = "persons"
+        # description = "Created for training"
+        #
+        # post_data = {
+        #     "extensionCode": my_extension_code,
+        #     "jsonLabel": jsonLabel,
+        #     "sqlProcessCode": "HEDM_EXTENSIONS",
+        #     "resourceName": resourceName,
+        #     "jsonPath": "/",
+        #     "sqlReadRuleCode": sqlReadRuleCode,
+        #     "jsonPropertyType": "S",
+        #     "description": description,
+        #     "columnName": columnName
+        # }
