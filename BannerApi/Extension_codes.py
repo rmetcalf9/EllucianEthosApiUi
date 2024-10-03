@@ -69,7 +69,11 @@ class ExtensionCodesMenu():
         if (selected_code == -1):
             return True
 
-        response = self.bannerClient.sendDeleteRequest(url=base_url, loginSession=self.loginSession)
+        def injectHeaders(headers):
+            headers["Content-Type"] = "application/json"
+            headers["Accept"] = "application/json"
+
+        response = self.bannerClient.sendDeleteRequest(url=base_url, loginSession=self.loginSession, injectHeadersFn=injectHeaders)
         if response.status_code != 200:
             print("There was an error deleting def with is " + str(selected_code) + ":", response.text, response.status_code)
         else:
