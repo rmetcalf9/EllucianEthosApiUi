@@ -76,9 +76,9 @@ class ExtensionCodesMenu():
 
         response = self.bannerClient.sendDeleteRequest(url= base_url + "/" + str(selected_code), loginSession=self.loginSession, injectHeadersFn=injectHeaders)
         if response.status_code != 200:
-            print("There was an error deleting def with is " + str(selected_code) + ":", response.text, response.status_code)
+            print("There was an error deleting code with ID " + str(selected_code) + ":", response.text, response.status_code)
         else:
-            print("Delete successful: ", response.text)
+            print("Delete code successful: ", response.text)
         return True
 
     def opt_create_extension_codes(self):
@@ -103,9 +103,9 @@ class ExtensionCodesMenu():
             data=json.dumps(post_data)
         )
         if response.status_code != 201:
-            print("There was an error creating def:", response.text, response.status_code)
+            print("There was an error creating code:", response.text, response.status_code)
         else:
             self.commonDefaults.set_default_string_value(code_default_name, code)
-            print("Create successful: ", response.text)
+            print("Create code successful: ", response.text)
 
         return True
