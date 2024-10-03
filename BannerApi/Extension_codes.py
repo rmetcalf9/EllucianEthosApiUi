@@ -21,7 +21,8 @@ class ExtensionCodesMenu():
 
     def run(self):
         operations = {
-            "View Extension Codes": self.opt_view_extension_codes
+            "View Extension Codes": self.opt_view_extension_codes,
+            "Delete Extension Code": self.opt_del_extension_codes
         }
         operation_list = []
         for operation in operations:
@@ -49,4 +50,28 @@ class ExtensionCodesMenu():
         response = self.bannerClient.sendGetRequest(url=base_url, loginSession=self.loginSession)
         print("\n".join(map(str, json.loads(response.text))))
 
+    def opt_del_extension_codes(self):
+        response = self.bannerClient.sendGetRequest(url=base_url, loginSession=self.loginSession)
+        codes = json.loads(response.text)
 
+        operation_list = []
+        for code in codes:
+            opt_str = "ID:" + str(code["id"]) + " code:" + code["code"] + " description:" + code["description"]
+            operation_list.append(Choice(value=code["id"], name=opt_str))
+        operation_list.append(Separator())
+        operation_list.append(Choice(value=-1, name="Cancel"))
+
+        selected_code = inquirer.select(
+            message="Select Code to delete:",
+            choices=operation_list
+        ).execute()
+
+        if (selected_code == -1):
+            return True
+
+        response = self.bannerClient.sendDeleteRequest(url=base_url, loginSession=self.loginSession)
+        if response.status_code != 200:
+            print("There was an error deleting def with is " + str(selected_code) + ":", response.text, response.status_code)
+        else:
+            print("Delete successful: ", response.text)
+        return True
