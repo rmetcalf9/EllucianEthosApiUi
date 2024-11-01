@@ -113,6 +113,11 @@ class ExtensionDefsMenu():
             message="Sql Read Rule Code:",
             default=self.commonDefaults.get_default_string_value(sqlReadRuleCode_default_name, "RJM_EXTRA_DATA")
         ).execute()
+        sqlWriteRuleCode_default_name = "opt_create_extension_codes_SqlWriteRuleCode"
+        sqlWriteRuleCode = inquirer.text(
+            message="Sql Write Rule Code:",
+            default=self.commonDefaults.get_default_string_value(sqlWriteRuleCode_default_name, "RJM_EXTRA_DATA_WRITE")
+        ).execute()
 
         columnName_default_name = "opt_create_extension_codes_columnName"
         columnName = inquirer.text(
@@ -139,6 +144,7 @@ class ExtensionDefsMenu():
             "resourceName": resourceName,
             "jsonPath": "/",
             "sqlReadRuleCode": sqlReadRuleCode,
+            "sqlWriteRuleCode": sqlWriteRuleCode,
             "jsonPropertyType": "S",
             "description": description,
             "columnName": columnName
@@ -160,6 +166,7 @@ class ExtensionDefsMenu():
             self.commonDefaults.set_default_string_value(code_default_name, code)
             self.commonDefaults.set_default_string_value(jsonLabel_default_name, jsonLabel)
             self.commonDefaults.set_default_string_value(sqlReadRuleCode_default_name, sqlReadRuleCode)
+            self.commonDefaults.set_default_string_value(sqlWriteRuleCode_default_name, sqlWriteRuleCode)
             self.commonDefaults.set_default_string_value(columnName_default_name, columnName)
             self.commonDefaults.set_default_string_value(resourceName_default_name, resourceName)
             self.commonDefaults.set_default_string_value(description_default_name, description)
