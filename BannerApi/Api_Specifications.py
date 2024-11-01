@@ -46,5 +46,23 @@ class ApiSpecificationsMenu():
 
     def opt_view_api_specifications(self):
         response = self.bannerClient.sendGetRequest(url=base_url, loginSession=self.loginSession)
-        print("\n".join(map(str, json.loads(response.text))))
+        responseJson = json.loads(response.text)
+
+        operation_list = []
+        for apispec in responseJson:
+            operation_list.append(Choice(value=apispec, name=apispec["resource"] + str(apispec["majorVersion"]) + apispec["status"]))
+        #print("\n".join(map(str, json.loads(response.text))))
+
+        action = inquirer.select(
+            message="Select Spec to view in detail:",
+            choices=operation_list,
+            default=None,
+            height=8
+        ).execute()
+
+        print("-------------------------")
+        print("Resource:", action["resource"], " - ver", str(action["majorVersion"]), " status:",  action["status"])
+        print("Json:")
+        print(json.dumps(action, indent=2))
+        print("-------------------------")
 
