@@ -167,3 +167,4 @@ cython_debug/
 .idea/
 
 
+/banner_api_spec_library/
