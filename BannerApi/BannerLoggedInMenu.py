@@ -7,6 +7,7 @@ import json
 from .Extension_codes import ExtensionCodesMenu
 from .Extension_definitions import ExtensionDefsMenu
 from .Extension_versions import ExtensionVersMenu
+from .Api_Specifications import ApiSpecificationsMenu
 
 class LoggedInMenu():
     bannerClient = None
@@ -24,7 +25,8 @@ class LoggedInMenu():
         operations = {
             "IntegrationApi_extension_codes": self.opt_integrationapi_extension_codes,
             "IntegrationApi_extension_definitions": self.opt_integrationapi_extension_definitions,
-            "IntegrationApi_extension_versions": self.opt_integrationapi_extension_versions
+            "IntegrationApi_extension_versions": self.opt_integrationapi_extension_versions,
+            "IntegrationApi_api_specifications": self.opt_integrationapi_api_specifications
         }
         operation_list = []
         for operation in operations:
@@ -56,4 +58,7 @@ class LoggedInMenu():
 
     def opt_integrationapi_extension_versions(self):
         return ExtensionVersMenu(self.bannerClient, self.loginSession, self.connection_name).run()
+
+    def opt_integrationapi_api_specifications(self):
+        return ApiSpecificationsMenu(self.bannerClient, self.loginSession, self.connection_name).run()
 
