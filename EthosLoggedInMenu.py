@@ -6,6 +6,7 @@ from CommonDefaults import CommonDefaults
 import json
 import GraphQlMenu
 import BpapiMenu
+import EthosPerformanceTesting
 
 class LoggedInMenu():
     ethosClient = None
@@ -27,6 +28,7 @@ class LoggedInMenu():
             "Get Person by name": self.opt_get_person_by_name,
             "Graph QL": self.opt_graph_ql,
             "Business Process API": self.opt_bpapi,
+            "Performance Tests": self.opt_performance,
         }
         operation_list = []
         for operation in operations:
@@ -247,3 +249,6 @@ class LoggedInMenu():
         bpapiMenu = BpapiMenu.BpapiMenu(self.ethosClient, self.loginSession, self.connection_name)
         return bpapiMenu.run()
 
+    def opt_performance(self):
+        performacneMenu = EthosPerformanceTesting.Menu(self.ethosClient, self.loginSession, self.connection_name)
+        return performacneMenu.run()

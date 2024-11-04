@@ -168,3 +168,4 @@ cython_debug/
 
 
 /banner_api_spec_library/
+/_performance_tests.json
