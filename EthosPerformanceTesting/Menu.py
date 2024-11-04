@@ -4,6 +4,7 @@ from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
 import os
 import json
+from .TestRunner import TestRunner
 
 SAVE_FILE_NAME="_performance_tests.json"
 
@@ -136,4 +137,6 @@ class Menu():
         if performance_test_name is None:
             return
 
-        print("TODO - run performance test", performance_test_name)
+        testRunner = TestRunner(self.ethosClient, self.loginSession, performance_test_name)
+        testRunner.run_test()
+
