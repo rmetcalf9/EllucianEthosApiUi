@@ -5,25 +5,21 @@ from .TestRunnerInstance import TestRunnerInstance
 # next as concurrent requests
 
 class TestRunner():
-    ethosClient = None
-    loginSession = None
+    getNewEthosClientAndLoginSession = None
     testdict = None
 
     baseline_instance = None
     concurrent_instances = None
 
-    def __init__(self, ethosClient, loginSession, testdict):
-        self.ethosClient = ethosClient
-        self.loginSession = loginSession
+    def __init__(self, getNewEthosClientAndLoginSession, testdict):
+        self.getNewEthosClientAndLoginSession = getNewEthosClientAndLoginSession
         self.testdict = testdict
 
-        self.baseline_instance = TestRunnerInstance(ethosClient, loginSession, testdict, runname="baseline")
+        self.baseline_instance = TestRunnerInstance(getNewEthosClientAndLoginSession, testdict, runname="baseline")
         self.concurrent_instances = []
         for x in range(0, testdict["num_concurrent"]):
-            # TODO Clone loginSession and ethosClient
             self.concurrent_instances.append(TestRunnerInstance(
-                ethosClient,
-                loginSession,
+                getNewEthosClientAndLoginSession,
                 testdict,
                 runname="Run-" + str(x)
             ))

@@ -108,19 +108,20 @@ class EthosConnectionMenu():
         connection = self.connections[connection_name]
         print("Connecting to", connection["name"])
 
-        ethosClient = EllucianEthosPythonClient.EllucianEthosAPIClient(
-            baseURL=connection["endpoint"],
-            mock=None,
-            verboseLogging=PythonAPIClientBase.VerboseLoggingOutputAllClass(
-                call=True,
-                include_data=True,
-                result=False
+
+        def getNewEthosClientAndLoginSession():
+            ethosClient = EllucianEthosPythonClient.EllucianEthosAPIClient(
+                baseURL=connection["endpoint"],
+                mock=None,
+                verboseLogging=PythonAPIClientBase.VerboseLoggingOutputAllClass(
+                    call=True,
+                    include_data=True,
+                    result=False
+                )
             )
-        )
-        loginSession = ethosClient.getLoginSessionFromAPIKey(apiKey=connection["apikey"])
+            loginSession = ethosClient.getLoginSessionFromAPIKey(apiKey=connection["apikey"])
+            return (ethosClient, loginSession)
 
-        print("Login session established")
-
-        loggedInMenu = EthosLoggedInMenu.LoggedInMenu(ethosClient, loginSession, connection_name)
+        loggedInMenu = EthosLoggedInMenu.LoggedInMenu(getNewEthosClientAndLoginSession, connection_name)
         return loggedInMenu.run()
 

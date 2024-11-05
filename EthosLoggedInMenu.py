@@ -9,14 +9,16 @@ import BpapiMenu
 import EthosPerformanceTesting
 
 class LoggedInMenu():
+    getNewEthosClientAndLoginSession = None
     ethosClient = None
     loginSession = None
     connection_name = None
     commonDefaults = None
 
-    def __init__(self, ethosClient, loginSession, connection_name):
-        self.ethosClient = ethosClient
-        self.loginSession = loginSession
+    def __init__(self, getNewEthosClientAndLoginSession, connection_name):
+        self.getNewEthosClientAndLoginSession = getNewEthosClientAndLoginSession
+        (self.ethosClient, self.loginSession) = getNewEthosClientAndLoginSession()
+        print("Login session established")
         self.connection_name = connection_name
         self.commonDefaults = CommonDefaults(connection_name)
 
@@ -250,5 +252,5 @@ class LoggedInMenu():
         return bpapiMenu.run()
 
     def opt_performance(self):
-        performacneMenu = EthosPerformanceTesting.Menu(self.ethosClient, self.loginSession, self.connection_name)
+        performacneMenu = EthosPerformanceTesting.Menu(self.getNewEthosClientAndLoginSession, self.connection_name)
         return performacneMenu.run()

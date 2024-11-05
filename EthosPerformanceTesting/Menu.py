@@ -9,16 +9,14 @@ from .TestRunner import TestRunner
 SAVE_FILE_NAME="_performance_tests.json"
 
 class Menu():
-    ethosClient = None
-    loginSession = None
+    getNewEthosClientAndLoginSession = None
     connection_name = None
     commonDefaults = None
 
     saved_data = None
 
-    def __init__(self, ethosClient, loginSession, connection_name):
-        self.ethosClient = ethosClient
-        self.loginSession = loginSession
+    def __init__(self, getNewEthosClientAndLoginSession, connection_name):
+        self.getNewEthosClientAndLoginSession = getNewEthosClientAndLoginSession
         self.connection_name = connection_name
         self.commonDefaults = CommonDefaults(connection_name)
         self.saved_data = {}
@@ -137,6 +135,6 @@ class Menu():
         if performance_test_name is None:
             return
 
-        testRunner = TestRunner(self.ethosClient, self.loginSession, performance_test_name)
+        testRunner = TestRunner(self.getNewEthosClientAndLoginSession, performance_test_name)
         testRunner.run_test()
 

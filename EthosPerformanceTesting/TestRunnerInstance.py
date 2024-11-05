@@ -2,6 +2,7 @@
 
 
 class TestRunnerInstance():
+    getNewEthosClientAndLoginSession = None
     ethosClient = None
     loginSession = None
     testdict = None
@@ -9,9 +10,9 @@ class TestRunnerInstance():
 
     hasRun = None
 
-    def __init__(self, ethosClient, loginSession, testdict, runname):
-        self.ethosClient = ethosClient
-        self.loginSession = loginSession
+    def __init__(self, getNewEthosClientAndLoginSession, testdict, runname):
+        self.getNewEthosClientAndLoginSession = getNewEthosClientAndLoginSession
+        (self.ethosClient, self.loginSession) = getNewEthosClientAndLoginSession()
         self.testdict = testdict
         self.runname = runname
         self.hasRun = False
