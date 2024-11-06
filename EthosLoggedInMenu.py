@@ -7,6 +7,7 @@ import json
 import GraphQlMenu
 import BpapiMenu
 import EthosPerformanceTesting
+from PersonManager import Menu as PersonManagerMenu
 
 class LoggedInMenu():
     getNewEthosClientAndLoginSession = None
@@ -31,6 +32,7 @@ class LoggedInMenu():
             "Graph QL": self.opt_graph_ql,
             "Business Process API": self.opt_bpapi,
             "Performance Tests": self.opt_performance,
+            "Personmanager": self.opt_personamanger,
         }
         operation_list = []
         for operation in operations:
@@ -254,3 +256,7 @@ class LoggedInMenu():
     def opt_performance(self):
         performacneMenu = EthosPerformanceTesting.Menu(self.getNewEthosClientAndLoginSession, self.connection_name)
         return performacneMenu.run()
+
+    def opt_personamanger(self):
+        personamangermenu = PersonManagerMenu(self.getNewEthosClientAndLoginSession, self.connection_name)
+        return personamangermenu.run()
