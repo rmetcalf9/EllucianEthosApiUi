@@ -8,6 +8,7 @@ import GraphQlMenu
 import BpapiMenu
 import EthosPerformanceTesting
 from PersonManager import Menu as PersonManagerMenu
+from PythonAPIClientBase.APIClientBase import APIClientException
 
 class LoggedInMenu():
     getNewEthosClientAndLoginSession = None
@@ -83,11 +84,16 @@ class LoggedInMenu():
 
         max = 5
         cur = 0
-        for resource_item in resourceItemsIterator:
-            print("Result " + str(cur), resource_item.dict)
-            cur += 1
-            if cur > max:
-                break
+        try:
+            for resource_item in resourceItemsIterator:
+                print("Result " + str(cur), resource_item.dict)
+                cur += 1
+                if cur > max:
+                    break
+        except APIClientException as err:
+            print("Exception occured")
+            print(err.getDescriptionString())
+            return
 
     def opt_get_resource(self):
         resource = EllucianCommonUtils.select_resource()
