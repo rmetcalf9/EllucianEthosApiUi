@@ -27,6 +27,16 @@ class ApiSpecLibrary():
             retVal.append(x)
         return retVal
 
+class SpecValidationError():
+    file = None
+    text = None
+    def __init__(self, file, text):
+        self.file = file
+        self.text = text
+
+    def getText(self):
+        return self.file.upper()[:7] + ":" + self.text
+
 class ApiSpecLibraryItem():
     library_path = None
     resource_name = None
@@ -66,3 +76,53 @@ class ApiSpecLibraryItem():
     def write_logic_json(self, payload):
         with open(self.get_spec_directory() + logic_filename, 'w') as fp:
             fp.write(payload)
+
+    def _read_endpoint_dict(self):
+        endpoint = None
+        with open(self.get_spec_directory() + endpoint_filename, 'r') as fp:
+            endpoint = json.load(fp)
+        return endpoint
+
+    def _get_endpoint_validation_errors(self):
+        retVal = []
+        endpoint_dict = None
+        try:
+            endpoint_dict = self._read_endpoint_dict()
+        except Exception as err:
+            retVal.append(SpecValidationError(endpoint_filename, "Invalid JSON " + str(err)))
+            return retVal
+
+        for path in endpoint_dict["paths"].keys():
+            if not path.startswith("/"):
+                retVal.append(SpecValidationError(endpoint_filename, "Path should start with / (Actual: " + path + ")"))
+            if path[1:].split("/")[0] != self.resource_name:
+                retVal.append(SpecValidationError(endpoint_filename, "Path should start with /" + self.resource_name + " (Actual: " + path + ")"))
+
+            for method in endpoint_dict["paths"][path]:
+                resource_tag_found = False
+                for tag in endpoint_dict["paths"][path][method]["tags"]:
+                    if tag == self.resource_name:
+                        resource_tag_found = True
+                if not resource_tag_found:
+                    retVal.append(SpecValidationError(
+                        endpoint_filename,
+                        "Path " + path + " method " + method + " should have a tag " + self.resource_name + " (Actual: " + str(endpoint_dict["paths"][path][method]["tags"]) + ")"
+                    ))
+
+        if endpoint_dict["info"]["title"] != self.resource_name:
+            retVal.append(SpecValidationError(
+                endpoint_filename,
+                "/info/title should be " + self.resource_name + " (Actual: " + endpoint_dict["info"]["title"] + ")"
+            ))
+
+        return retVal
+
+    def _get_logic_validation_errors(self):
+        return []
+
+
+    def get_validation_errors(self):
+        ret_errors = []
+        ret_errors += self._get_endpoint_validation_errors()
+        ret_errors += self._get_logic_validation_errors()
+        return ret_errors

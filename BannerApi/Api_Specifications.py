@@ -30,6 +30,7 @@ class ApiSpecificationsMenu():
             "View Api endpoint Specification": self.opt_view_api_endpoint_specification,
             "View Api logic Specification": self.opt_view_api_logic_specification,
             "Clone spec to local Library": self.opt_clone_logic_specification,
+            "Validate Spec in Library": self.opt_validate_specification,
             "Deploy spec from local Library": self.opt_deploy_logic_specification
         }
         operation_list = []
@@ -181,6 +182,26 @@ class ApiSpecificationsMenu():
             print("Selected resource_version:", resource_version)
             raise Exception("Error resource selected doesn't exist")
         return retVal
+
+    def opt_validate_specification(self):
+        spec = self._get_spec_from_library()
+        if spec is None:
+            print("No resources in library")
+            return
+
+        while True:
+            validation_errors = spec.get_validation_errors()
+            if len(validation_errors) == 0:
+                print("No errors found")
+
+            for validation_error in validation_errors:
+                print(validation_error.getText())
+
+            if not inquirer.confirm(
+                message="Re-run validation of " + spec.library_path,
+                default=True
+            ).execute():
+                break
 
 
     def opt_deploy_logic_specification(self):
