@@ -35,7 +35,7 @@ class SpecValidationError():
         self.text = text
 
     def getText(self):
-        return self.file.upper()[:7] + ":" + self.text
+        return self.file.upper()[:10] + ":" + self.text
 
 class ApiSpecLibraryItem():
     library_path = None
@@ -77,17 +77,23 @@ class ApiSpecLibraryItem():
         with open(self.get_spec_directory() + logic_filename, 'w') as fp:
             fp.write(payload)
 
-    def _read_endpoint_dict(self):
+    def read_endpoint_dict(self):
         endpoint = None
         with open(self.get_spec_directory() + endpoint_filename, 'r') as fp:
             endpoint = json.load(fp)
         return endpoint
 
+    def read_logic_dict(self):
+        logic = None
+        with open(self.get_spec_directory() + logic_filename, 'r') as fp:
+            logic = json.load(fp)
+        return logic
+
     def _get_endpoint_validation_errors(self):
         retVal = []
         endpoint_dict = None
         try:
-            endpoint_dict = self._read_endpoint_dict()
+            endpoint_dict = self.read_endpoint_dict()
         except Exception as err:
             retVal.append(SpecValidationError(endpoint_filename, "Invalid JSON " + str(err)))
             return retVal
@@ -118,8 +124,14 @@ class ApiSpecLibraryItem():
         return retVal
 
     def _get_logic_validation_errors(self):
-        return []
-
+        retVal = []
+        logic_dict = None
+        try:
+            logic_dict = self.read_logic_dict()
+        except Exception as err:
+            retVal.append(SpecValidationError(logic_filename, "Invalid JSON " + str(err)))
+            return retVal
+        return retVal
 
     def get_validation_errors(self):
         ret_errors = []

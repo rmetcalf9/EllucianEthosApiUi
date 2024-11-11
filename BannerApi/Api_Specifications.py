@@ -213,6 +213,11 @@ class ApiSpecificationsMenu():
             print("No resources in library")
             return
 
+        validation_errors = spec.get_validation_errors()
+        if len(validation_errors) != 0:
+            print("This spec has validation errors. Clear them before deploying")
+            return
+
         def find_resource():
             responseJson = self.bannerClient.getListResource(url=base_url, loginSession=self.loginSession)
             for resp in responseJson:
@@ -261,7 +266,37 @@ class ApiSpecificationsMenu():
             if responseJson["id"] != found_resource["id"]:
                 raise Exception("Created resource GUID doesn't match searched for id")
 
-        print("DD", found_resource, " TODO Next stage")
+        def injectHeadersEndpointFn(headers):
+            headers["Accept"] = endpoint_spec_content_type
+            headers["Content-type"] = endpoint_spec_content_type
+
+        put_endpoint_response = self.bannerClient.sendPutRequest(
+            url=base_url + "/" + found_resource["id"],
+            loginSession=self.loginSession,
+            data=json.dumps(spec.read_endpoint_dict()),
+            injectHeadersFn=injectHeadersEndpointFn
+        )
+        if put_endpoint_response.status_code != 200:
+            print("Status:", put_endpoint_response.status_code)
+            print("Text:", put_endpoint_response.text)
+            raise Exception("Error sending PUT request for endpoint")
+
+        def injectHeadersLogicFn(headers):
+            headers["Accept"] = logic_spec_content_type
+            headers["Content-type"] = logic_spec_content_type
+
+        put_logic_response = self.bannerClient.sendPutRequest(
+            url=base_url + "/" + found_resource["id"],
+            loginSession=self.loginSession,
+            data=json.dumps(spec.read_logic_dict()),
+            injectHeadersFn=injectHeadersLogicFn
+        )
+        if put_logic_response.status_code != 200:
+            print("Status:", put_logic_response.status_code)
+            print("Text:", put_logic_response.text)
+            raise Exception("Error sending PUT request for logic")
+
+        print("Spec deployed")
 
     def opt_delete_api_specification(self):
         api_spec = self._select_api_specification(msg="Select api spec to delete")
