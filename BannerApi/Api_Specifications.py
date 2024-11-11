@@ -31,7 +31,8 @@ class ApiSpecificationsMenu():
             "View Api logic Specification": self.opt_view_api_logic_specification,
             "Clone spec to local Library": self.opt_clone_logic_specification,
             "Validate Spec in Library": self.opt_validate_specification,
-            "Deploy spec from local Library": self.opt_deploy_logic_specification
+            "Deploy spec from local Library": self.opt_deploy_full_specification,
+            "Delete custom API spec": self.opt_delete_api_specification
         }
         operation_list = []
         for operation in operations:
@@ -56,12 +57,14 @@ class ApiSpecificationsMenu():
         self.run()
 
     def _select_api_specification(self, msg="Select Spec to view in detail:"):
-        response = self.bannerClient.sendGetRequest(url=base_url, loginSession=self.loginSession)
-        responseJson = json.loads(response.text)
+        responseJson = self.bannerClient.getListResource(url=base_url, loginSession=self.loginSession)
 
         operation_list = []
         for apispec in responseJson:
-            operation_list.append(Choice(value=apispec, name=apispec["resource"] + str(apispec["majorVersion"]) + apispec["status"]))
+            majorVersion = ""
+            if "majorVersion" in apispec:
+                majorVersion = str(apispec["majorVersion"])
+            operation_list.append(Choice(value=apispec, name=apispec["resource"] + ":" + majorVersion + " " + apispec["status"]))
         #print("\n".join(map(str, json.loads(response.text))))
 
         return inquirer.select(
@@ -204,18 +207,80 @@ class ApiSpecificationsMenu():
                 break
 
 
-    def opt_deploy_logic_specification(self):
+    def opt_deploy_full_specification(self):
         spec = self._get_spec_from_library()
         if spec is None:
             print("No resources in library")
             return
 
+        def find_resource():
+            responseJson = self.bannerClient.getListResource(url=base_url, loginSession=self.loginSession)
+            for resp in responseJson:
+                if resp["resource"] == spec.resource_name:
+                    return resp
+            return None
+
+        found_resource = find_resource()
+
         print("Selected resource to deploy:", spec.get_text())
+
+        if found_resource:
+            print("Resource has been deployed - will overwrite")
+        else:
+            print("This resource is not yet deployed - will create new deployment")
+
         print("This step will deploy and overwrite the api specification in Banner")
-        input("Press Enter to continue...")
+        if not inquirer.confirm(
+                message="Continue",
+                default=False
+        ).execute():
+            return
 
-        print("TODO try and find this resource")
-        print("if it exists then confirm to overwrite in banner")
-        print("send requests to create resource")
+        if not found_resource:
+            def injectHeadersFn(headers):
+                headers["Accept"] = "application/json"
+                headers["Content-type"] = "application/json"
 
-    # TODO Implement delete of API
+            post_data = {
+                "id": "00000000-0000-0000-0000-000000000000",
+                "resource": spec.resource_name
+            }
+            response = self.bannerClient.sendPostRequest(
+                url=base_url,
+                loginSession=self.loginSession,
+                data=json.dumps(post_data),
+                injectHeadersFn=injectHeadersFn
+            )
+            if response.status_code != 201:
+                print("Status:", response.status_code)
+                print("Text:", response.text)
+                raise Exception("Error creating spec")
+
+            responseJson = json.loads(response.text)
+            found_resource = find_resource()
+            if responseJson["id"] != found_resource["id"]:
+                raise Exception("Created resource GUID doesn't match searched for id")
+
+        print("DD", found_resource, " TODO Next stage")
+
+    def opt_delete_api_specification(self):
+        api_spec = self._select_api_specification(msg="Select api spec to delete")
+        print("Delete ", api_spec)
+        if not inquirer.confirm(
+                message="Are you sure",
+                default=False
+        ).execute():
+            return
+
+        response = self.bannerClient.sendDeleteRequest(
+            url=base_url + "/" + api_spec["id"],
+            loginSession=self.loginSession,
+            injectHeadersFn=None
+        )
+        if response.status_code != 200:
+            print("Status:", response.status_code)
+            print("Text:", response.text)
+            raise Exception("Error deleting spec")
+
+        print("Delete successful")
+
