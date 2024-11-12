@@ -62,53 +62,7 @@ class Menu():
             "otherInterestedSources": [
             ],
             "persons": {
-                "id": "00000000-0000-0000-0000-000000000000",
-                "confidential": False,
                 "dateOfBirth": "2004-05-31",
-                "birthCountry": "USA",
-                "birthRegion": "NorthAmerica",
-                "birthLocality": "Reston",
-                "dateDeceased": None,
-                "deceased": "notDeceased",
-                "races": [
-                    {
-                        "reporting": {
-                            "code": "USA",
-                            "racialCategory": "americanIndianOrAlaskaNative"
-                        }
-                    }
-                ],
-                "ethnicities": [
-                    {
-                        "reporting": {
-                            "ethnicCategory": "nonHispanic",
-                            "code": "USA"
-                        }
-                    }
-                ],
-                "religion": {
-                    "id": "472c2097-5d7a-4d6f-b95a-85b30bf6e36c"
-                },
-                "maritalStatus": [
-                    {
-                        "maritalCategory": "single"
-                    }
-                ],
-                "gender": {
-                    "value": "female"
-                },
-                "citizenship": [
-                    {
-                        "status": "citizen",
-                        "country": "USA"
-                    }
-                ],
-                "languages": [
-                    {
-                        "code": "ENG",
-                        "preference": "primary"
-                    }
-                ],
                 "names": [
                     {
                         "status": "active",
@@ -125,137 +79,6 @@ class Menu():
                         ],
                         "prefix": "Ms."
                     }
-                ],
-                "addresses": [
-                    {
-                        "status": "active",
-                        "addressLines": [
-                            "1029 Sailboat Ave"
-                        ],
-                        "countryCode": "USA",
-                        "countryTitle": "United States of America",
-                        "locality": "Herndon",
-                        "postalCode": "20170",
-                        "regionTitle": "Virginia",
-                        "regionCode": "US-VA",
-                        "subRegionCode": "FAX",
-                        "subRegionTitle": "Fairfax",
-                        "type": {
-                            "detail": {
-                                "id": "d8cdba43-0a36-4acc-bcde-23de54c1cced"
-                            },
-                            "category": "mailing"
-                        }
-                    }
-                ],
-                "phones": [
-                    {
-                        "status": "active",
-                        "number": "703-444-2233",
-                        "type": {
-                            "category": "home"
-                        },
-                        "countryCallingCode": "+1",
-                        "preference": "primary"
-                    }
-                ],
-                "emails": [
-                    {
-                        "status": "active",
-                        "address": "jlewis@example.com",
-                        "type": {
-                            "category": "personal"
-                        }
-                    }
-                ],
-                "socialMedia": [
-                    {
-                        "type": "linkedIn",
-                        "status": "active",
-                        "address": "linkedin.com/in/jennlewis/"
-                    }
-                ],
-                "identityDocuments": [
-                    {
-                        "status": "active",
-                        "documentId": "221384755",
-                        "type": {
-                            "category": "ssn"
-                        },
-                        "countryCode": "USA"
-                    }
-                ],
-                "visas": [
-                    {
-                        "status": "active",
-                        "type": {
-                            "category": "nonImmigrant",
-                            "detail": {
-                                "id": "80bbd446-0f35-49d1-9097-09bd834ed5d6"
-                            }
-                        },
-                        "visaId": "155657789",
-                        "requestedOn": "2020-12-12",
-                        "issuedOn": "2020-12-12",
-                        "expiresOn": "2030-12-31"
-                    }
-                ],
-                "alternativeCredentials": [
-                    {
-                        "credentialId": "Test Alternative Credential",
-                        "type": {
-                            "id": "9e09373b-44d1-452d-a5ef-ff4e1866d9a0"
-                        }
-                    }
-                ],
-                "emergencyContacts": [
-                    {
-                        "name": {
-                            "fullName": "Olivia Conrad",
-                            "firstName": "Olivia",
-                            "lastName": "Conrad"
-                        },
-                        "types": [
-                            {
-                                "id": "d8adfb93-4c49-4c0e-b378-3c739b9f7542"
-                            }
-                        ],
-                        "relationship": {
-                            "category": "Sister",
-                            "detail": {
-                                "id": "aab8965d-1003-4bbf-8337-47bf652679cf"
-                            }
-                        },
-                        "phones": [
-                            {
-                                "number": "703-678-2211"
-                            }
-                        ],
-                        "emails": [
-                            {
-                                "address": "olivia@example.com"
-                            }
-                        ],
-                        "address": {
-                            "addressLines": [
-                                "12008 Olivia St."
-                            ],
-                            "countryCode": "USA",
-                            "countryTitle": "United States of America",
-                            "locality": "Vienna",
-                            "postalCode": "22180",
-                            "regionTitle": "Virginia",
-                            "regionCode": "US-VA",
-                            "subRegionCode": "FAX",
-                            "subRegionTitle": "Fairfax"
-                        },
-                        "priority": None,
-                        "notes": "Adding EC record",
-                        "lastConfirmedDate": None,
-                        "startOn": None,
-                        "endOn": None,
-                        "statusDate": None
-                    }
                 ]
             }
         }
@@ -269,7 +92,7 @@ class Menu():
         result = self.ethosClient.sendPostRequest(
             url="/api/person-find-or-create-requests",
             params=params,
-            data=data,
+            data=json.dumps(data),
             loginSession=self.loginSession,
             injectHeadersFn=injectHeaderFN
         )
