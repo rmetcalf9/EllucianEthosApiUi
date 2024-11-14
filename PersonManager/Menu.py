@@ -62,13 +62,20 @@ class Menu():
             default=""
         ).execute()
         last_name = inquirer.text(
-            message="Last name to match with (Blank to not match with first name):",
+            message="Last name to match with (Blank to not match):",
             default=""
         ).execute()
         dob = inquirer.text(
-            message="Date of birth to match with YYYY-MM-DD (Blank to not match with first name):",
+            message="Date of birth to match with YYYY-MM-DD (Blank to not match):",
             default="1979-11-22"
         ).execute()
+
+        if first_name == "":
+            first_name = None
+        if last_name == "":
+            last_name = None
+        if dob == "":
+            dob = None
 
         data = {
             "skipCreate": True,
@@ -79,28 +86,18 @@ class Menu():
             "otherInterestedSources": [
             ],
             "persons": {
-                "dateOfBirth": "2004-05-31",
+                "dateOfBirth": dob,
                 "names": [
                     {
                         "status": "active",
-                        "fullName": "Jennifer Lewis",
-                        "firstName": "Jennifer",
-                        "middleName": None,
-                        "lastName": "Lewis",
-                        "preference": "preferred",
-                        "type": {
-                            "category": "legal"
-                        },
-                        "professionalAbbreviations": [
-                            "Ph.D"
-                        ],
-                        "prefix": "Ms."
+                        "firstName": first_name,
+                        "fullName": first_name + " " + last_name,
+                        "middleName": "James",
+                        "lastName": last_name,
                     }
                 ]
             }
         }
-
-        #self.ethosClient, self.loginSession
 
         result = self.ethosClient.sendPostRequest(
             url="/api/person-find-or-create-requests",
