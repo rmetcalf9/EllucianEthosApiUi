@@ -50,7 +50,6 @@ class EthosConnectionMenu():
                 return F
 
             first_connection = None
-            print("self conns IN LOOP", self.connections)
             for connection in self.connections:
                 prompt_string = "Connect to " + connection
                 if first_connection is None:

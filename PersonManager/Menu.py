@@ -9,6 +9,11 @@ import os
 import json
 
 
+def injectHeaderFN(headers):
+    headers["Content-Type"] = "application/json"
+    headers["accept"] = "application/json"
+
+
 class Menu():
     getNewEthosClientAndLoginSession = None
     connection_name = None
@@ -25,7 +30,7 @@ class Menu():
 
     def run(self):
         operations = {
-            "Person find or create": self.opt_person_search,
+            "Person find or create - Match a person no creation": self.opt_person_search,
         }
         operation_list = []
         for operation in operations:
@@ -51,7 +56,19 @@ class Menu():
 
     def opt_person_search(self):
         params = {}
-        data = {}
+
+        first_name = inquirer.text(
+            message="First name to match with (Blank to not match with first name):",
+            default=""
+        ).execute()
+        last_name = inquirer.text(
+            message="Last name to match with (Blank to not match with first name):",
+            default=""
+        ).execute()
+        dob = inquirer.text(
+            message="Date of birth to match with YYYY-MM-DD (Blank to not match with first name):",
+            default="1979-11-22"
+        ).execute()
 
         data = {
             "skipCreate": True,
@@ -85,10 +102,6 @@ class Menu():
 
         #self.ethosClient, self.loginSession
 
-        def injectHeaderFN(headers):
-            headers["Content-Type"] = "application/json"
-            headers["accept"] = "application/json"
-
         result = self.ethosClient.sendPostRequest(
             url="/api/person-find-or-create-requests",
             params=params,
@@ -96,9 +109,36 @@ class Menu():
             loginSession=self.loginSession,
             injectHeadersFn=injectHeaderFN
         )
-        if result.status_code != 200:
+        if result.status_code != 201:
             print("Response:", result.status_code)
             print("Response test:", result.text)
             raise Exception("Exception returned")
 
-        print("TODO", result.text)
+        resultJson = json.loads(result.text)
+        print("Received response:", resultJson)
+
+        requestId = resultJson["id"]
+        requestStatus = resultJson["status"]
+        print("RequestId:", requestId)
+        print("Status:", requestStatus)
+
+        return self._get_request_update(requestId)
+
+    def _get_request_update(self, requestId):
+        if not inquirer.confirm(
+            message="Re-query person manager to get update",
+            default=True
+        ).execute():
+            return
+
+        result = self.ethosClient.sendGetRequest(
+            url="/api/person-find-or-create-requests/" + requestId,
+            params=None,
+            loginSession=self.loginSession,
+            injectHeadersFn=injectHeaderFN
+        )
+        print("Result:", result.status_code)
+        print("Body:", result.text)
+
+        return self._get_request_update(requestId)
+
