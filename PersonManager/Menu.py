@@ -1,7 +1,5 @@
+from SubMenuBaseClass import SubMenuEthosBaseClass
 
-
-
-from CommonDefaults import CommonDefaults
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
@@ -14,45 +12,14 @@ def injectHeaderFN(headers):
     headers["accept"] = "application/json"
 
 
-class Menu():
-    getNewEthosClientAndLoginSession = None
-    connection_name = None
-    commonDefaults = None
-    ethosClient = None
-    loginSession = None
-
+class Menu(SubMenuEthosBaseClass):
     def __init__(self, getNewEthosClientAndLoginSession, connection_name):
-        self.getNewEthosClientAndLoginSession = getNewEthosClientAndLoginSession
-        (self.ethosClient, self.loginSession) = getNewEthosClientAndLoginSession()
-        self.connection_name = connection_name
-        self.commonDefaults = CommonDefaults(connection_name)
+        super().__init__(menu_name="PersonManager", getNewEthosClientAndLoginSession=getNewEthosClientAndLoginSession, connection_name=connection_name)
 
-
-    def run(self):
-        operations = {
+    def _list_of_operations(self):
+        return {
             "Person find or create - Match a person no creation": self.opt_person_search,
         }
-        operation_list = []
-        for operation in operations:
-            operation_list.append(Choice(value=operation, name=operation))
-
-        logout_text = "Back (" + self.connection_name + ")"
-
-        action = inquirer.select(
-            message="Select an action:",
-            choices=operation_list + [
-                Separator(),
-                Choice(value=None, name=logout_text),
-            ],
-            default=logout_text,
-            height=8
-        ).execute()
-        if action is None:
-            return False
-        print("")
-        operations[action]()
-        print("")
-        self.run()
 
     def opt_person_search(self):
         params = {}

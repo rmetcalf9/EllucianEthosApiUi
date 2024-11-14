@@ -10,6 +10,9 @@ import EthosPerformanceTesting
 from PersonManager import Menu as PersonManagerMenu
 from PythonAPIClientBase.APIClientBase import APIClientException
 
+from PopulationSelectionSubMenu import PopulationSelectionSubMenu
+
+
 class LoggedInMenu():
     getNewEthosClientAndLoginSession = None
     ethosClient = None
@@ -34,6 +37,7 @@ class LoggedInMenu():
             "Business Process API": self.opt_bpapi,
             "Performance Tests": self.opt_performance,
             "Personmanager": self.opt_personamanger,
+            "Population Selection": self.opt_popsel,
         }
         operation_list = []
         for operation in operations:
@@ -266,3 +270,7 @@ class LoggedInMenu():
     def opt_personamanger(self):
         personamangermenu = PersonManagerMenu(self.getNewEthosClientAndLoginSession, self.connection_name)
         return personamangermenu.run()
+
+    def opt_popsel(self):
+        popselmenu = PopulationSelectionSubMenu(self.getNewEthosClientAndLoginSession, self.connection_name)
+        return popselmenu.run()
