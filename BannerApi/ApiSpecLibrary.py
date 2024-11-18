@@ -3,6 +3,7 @@ import shutil
 import json
 
 endpoint_filename = "/endpoint.json"
+resource_filename = "/resource.json"
 logic_filename = "/logic.json"
 
 class ApiSpecLibrary():
@@ -73,6 +74,10 @@ class ApiSpecLibraryItem():
         with open(self.get_spec_directory() + endpoint_filename, 'w') as fp:
             fp.write(payload)
 
+    def write_resource_json(self, payload):
+        with open(self.get_spec_directory() + resource_filename, 'w') as fp:
+            fp.write(payload)
+
     def write_logic_json(self, payload):
         with open(self.get_spec_directory() + logic_filename, 'w') as fp:
             fp.write(payload)
@@ -82,6 +87,12 @@ class ApiSpecLibraryItem():
         with open(self.get_spec_directory() + endpoint_filename, 'r') as fp:
             endpoint = json.load(fp)
         return endpoint
+
+    def read_resource_dict(self):
+        resource = None
+        with open(self.get_spec_directory() + resource_filename, 'r') as fp:
+            resource = json.load(fp)
+        return resource
 
     def read_logic_dict(self):
         logic = None
@@ -131,10 +142,27 @@ class ApiSpecLibraryItem():
         except Exception as err:
             retVal.append(SpecValidationError(logic_filename, "Invalid JSON " + str(err)))
             return retVal
+
+        if logic_dict["resource"] != self.resource_name:
+            retVal.append(SpecValidationError(logic_filename, "Resource should be " + self.resource_name + " (Actual: " + logic_dict["resource"] + ")"))
+
         return retVal
+
+    def _get_resource_validation_errors(self):
+        retVal = []
+        recource_dict = None
+        try:
+            recource_dict = self.read_resource_dict()
+        except Exception as err:
+            retVal.append(SpecValidationError(resource_filename, "Invalid JSON " + str(err)))
+            return retVal
+
+        return retVal
+
 
     def get_validation_errors(self):
         ret_errors = []
         ret_errors += self._get_endpoint_validation_errors()
         ret_errors += self._get_logic_validation_errors()
+        ret_errors += self._get_resource_validation_errors()
         return ret_errors

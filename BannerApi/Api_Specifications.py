@@ -8,6 +8,7 @@ from .ApiSpecLibrary import ApiSpecLibrary
 base_url= "/IntegrationApi/api/api-specifications"
 
 endpoint_spec_content_type="application/vnd.hedtech.integration.endpoint-specifications.v1+json"
+resource_spec_content_type="application/vnd.hedtech.integration.resource-specifications.v1+json"
 logic_spec_content_type="application/vnd.hedtech.integration.logic-specifications.v1+json"
 
 class ApiSpecificationsMenu():
@@ -28,6 +29,7 @@ class ApiSpecificationsMenu():
         operations = {
             "View Api Specifications": self.opt_view_api_specifications,
             "View Api endpoint Specification": self.opt_view_api_endpoint_specification,
+            "View Api resource Specification": self.opt_view_api_resource_specification,
             "View Api logic Specification": self.opt_view_api_logic_specification,
             "Clone spec to local Library": self.opt_clone_logic_specification,
             "Validate Spec in Library": self.opt_validate_specification,
@@ -99,6 +101,9 @@ class ApiSpecificationsMenu():
     def opt_view_api_endpoint_specification(self):
         return self._get_api_spec_detail(endpoint_spec_content_type)
 
+    def opt_view_api_resource_specification(self):
+        return self._get_api_spec_detail(resource_spec_content_type)
+
     def opt_view_api_logic_specification(self):
         return self._get_api_spec_detail(logic_spec_content_type)
 
@@ -140,6 +145,7 @@ class ApiSpecificationsMenu():
             libspec.delete()
 
         self._get_api_spec_detail(endpoint_spec_content_type, libspec.write_endpoint_json, action_id=api_spec_to_clone["id"])
+        self._get_api_spec_detail(resource_spec_content_type, libspec.write_resource_json, action_id=api_spec_to_clone["id"])
         self._get_api_spec_detail(logic_spec_content_type, libspec.write_logic_json, action_id=api_spec_to_clone["id"])
 
     def _get_spec_from_library(self, res_msg="Select resource to deploy", ver_msg="Select major version of resource to deploy"):
@@ -269,7 +275,6 @@ class ApiSpecificationsMenu():
         def injectHeadersEndpointFn(headers):
             headers["Accept"] = endpoint_spec_content_type
             headers["Content-type"] = endpoint_spec_content_type
-
         put_endpoint_response = self.bannerClient.sendPutRequest(
             url=base_url + "/" + found_resource["id"],
             loginSession=self.loginSession,
@@ -281,10 +286,23 @@ class ApiSpecificationsMenu():
             print("Text:", put_endpoint_response.text)
             raise Exception("Error sending PUT request for endpoint")
 
+        def injectHeadersResourceFn(headers):
+            headers["Accept"] = resource_spec_content_type
+            headers["Content-type"] = resource_spec_content_type
+        put_resource_response = self.bannerClient.sendPutRequest(
+            url=base_url + "/" + found_resource["id"],
+            loginSession=self.loginSession,
+            data=json.dumps(spec.read_resource_dict()),
+            injectHeadersFn=injectHeadersResourceFn
+        )
+        if put_resource_response.status_code != 200:
+            print("Status:", put_resource_response.status_code)
+            print("Text:", put_resource_response.text)
+            raise Exception("Error sending PUT request for resource")
+
         def injectHeadersLogicFn(headers):
             headers["Accept"] = logic_spec_content_type
             headers["Content-type"] = logic_spec_content_type
-
         put_logic_response = self.bannerClient.sendPutRequest(
             url=base_url + "/" + found_resource["id"],
             loginSession=self.loginSession,
@@ -294,7 +312,9 @@ class ApiSpecificationsMenu():
         if put_logic_response.status_code != 200:
             print("Status:", put_logic_response.status_code)
             print("Text:", put_logic_response.text)
-            raise Exception("Error sending PUT request for logic")
+            print("Error sending PUT request for logic")
+            return
+            #raise Exception("Error sending PUT request for logic")
 
         print("Spec deployed")
 
