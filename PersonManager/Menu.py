@@ -18,36 +18,62 @@ class Menu(SubMenuEthosBaseClass):
 
     def _list_of_operations(self):
         return {
-            "Person find or create - Match a person no creation": self.opt_person_search,
+            "Person find or create - Match a person": self.opt_person_search,
         }
 
     def opt_person_search(self):
-        params = {}
+        default_name_first_name = "def_first_name"
+        default_name_last_name = "def_last_name"
+        default_name_middle_name= "def_middle_name"
+        default_name_dob = "def_dob"
 
         first_name = inquirer.text(
             message="First name to match with (Blank to not match with first name):",
-            default=""
+            default=self.commonDefaults.get_default_string_value(default_name_first_name, "")
         ).execute()
         last_name = inquirer.text(
             message="Last name to match with (Blank to not match):",
-            default=""
+            default=self.commonDefaults.get_default_string_value(default_name_last_name, "")
+        ).execute()
+        middle_name = inquirer.text(
+            message="Middle name to match with:",
+            default=self.commonDefaults.get_default_string_value(default_name_middle_name, "")
         ).execute()
         dob = inquirer.text(
             message="Date of birth to match with YYYY-MM-DD (Blank to not match):",
-            default="1979-11-22"
+            default=self.commonDefaults.get_default_string_value(default_name_dob, "1979-11-22")
         ).execute()
+
+        skipVerification = inquirer.confirm(
+            message="Do you want to skip verification?",
+            default=True
+        ).execute()
+
+        skipUpdate = inquirer.confirm(
+            message="Do you want to skip update?",
+            default=True
+        ).execute()
+
+        skipCreate = inquirer.confirm(
+            message="Do you want to skip create?",
+            default=True
+        ).execute()
+
 
         if first_name == "":
             first_name = None
+        if middle_name == "":
+            middle_name = None
         if last_name == "":
             last_name = None
         if dob == "":
             dob = None
 
+        params = {}
         data = {
-            "skipCreate": True,
-            "skipVerification": True,
-            "skipUpdate": True,
+            "skipCreate": skipCreate,
+            "skipVerification": skipVerification,
+            "skipUpdate": skipUpdate,
             "source": "ellucianEthosApiUITest",
             "confidential": False,
             "otherInterestedSources": [
@@ -59,7 +85,7 @@ class Menu(SubMenuEthosBaseClass):
                         "status": "active",
                         "firstName": first_name,
                         "fullName": first_name + " " + last_name,
-                        "middleName": "James",
+                        "middleName": middle_name,
                         "lastName": last_name,
                     }
                 ]
@@ -85,6 +111,11 @@ class Menu(SubMenuEthosBaseClass):
         requestStatus = resultJson["status"]
         print("RequestId:", requestId)
         print("Status:", requestStatus)
+
+        self.commonDefaults.set_default_string_value(default_name_first_name, first_name)
+        self.commonDefaults.set_default_string_value(default_name_last_name, last_name)
+        self.commonDefaults.set_default_string_value(default_name_middle_name, middle_name)
+        self.commonDefaults.set_default_string_value(default_name_dob, dob)
 
         return self._get_request_update(requestId)
 
