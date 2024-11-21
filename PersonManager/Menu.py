@@ -77,6 +77,7 @@ class Menu(SubMenuEthosBaseClass):
             "source": "ellucianEthosApiUITest",
             "confidential": False,
             "otherInterestedSources": [
+                "erp"
             ],
             "persons": {
                 "dateOfBirth": dob,
