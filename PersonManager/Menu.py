@@ -138,3 +138,4 @@ class Menu(SubMenuEthosBaseClass):
 
         return self._get_request_update(requestId)
 
+
