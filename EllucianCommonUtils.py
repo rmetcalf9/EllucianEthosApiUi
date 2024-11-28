@@ -24,6 +24,9 @@ resource_list = {
     },
     "person-name-types": {
         "default_version_to_set": None
+    },
+    "hesa-courses": {
+        "default_version_to_set": None
     }
 }
 

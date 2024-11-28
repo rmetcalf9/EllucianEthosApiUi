@@ -31,6 +31,7 @@ class LoggedInMenu():
         operations = {
             "Appconfig": self.opt_appconfig,
             "Get Resource": self.opt_get_resource,
+            "Get Resource using criteria": self.opt_get_resource_using_criteria,
             "Get Resource List": self.opt_get_resource_list,
             "Get Person by name": self.opt_get_person_by_name,
             "Graph QL": self.opt_graph_ql,
@@ -274,3 +275,68 @@ class LoggedInMenu():
     def opt_popsel(self):
         popselmenu = PopulationSelectionSubMenu(self.getNewEthosClientAndLoginSession, self.connection_name)
         return popselmenu.run()
+
+    def opt_get_resource_using_criteria(self):
+        resource = EllucianCommonUtils.resource_list["persons"]
+
+        criteria_string_default_name = "opt_get_person_by_criteria_citeria_string"
+        criteria_text = ""
+        while criteria_text == "":
+            criteria_text = inquirer.text(
+                message="Enter Criteria:",
+                default=self.commonDefaults.get_default_string_value(criteria_string_default_name, '{"credentials": [{ "type": "bannerId", "value": "2848976" }]}')
+            ).execute()
+            try:
+                criteria_dict = json.loads(criteria_text)
+            except:
+                print("Invalid JSON")
+                criteria_text = ""
+
+        version_default_name = "opt_get_person_by_criteria_version"
+        version = inquirer.text(
+            message="Enter requested version:",
+            default=self.commonDefaults.get_default_string_value(version_default_name, resource["default_version_to_set"])
+        ).execute()
+        # empty string is ok
+
+        maxrows_default_name = "opt_get_person_by_criteria_maxrows"
+        maxrows = inquirer.text(
+            message="Max rows to return:",
+            default=self.commonDefaults.get_default_string_value(maxrows_default_name, "5")
+        ).execute()
+
+        offset_default_name = "opt_get_person_by_criteria_offset"
+        offset = inquirer.text(
+            message="Offset:",
+            default=self.commonDefaults.get_default_string_value(offset_default_name, "0")
+        ).execute()
+
+        params = {"criteria": json.dumps(criteria_dict), "limit": maxrows, "offset": offset}
+
+        def injectHeadersFn(headers):
+            headers["Content-Type"] = "application/json"
+            headers["accept"] = "application/vnd.hedtech.integration.v" + version + "+json"
+
+        response = self.ethosClient.sendGetRequest(
+            url="/api/persons",
+            loginSession=self.loginSession,
+            params=params,
+            injectHeadersFn=injectHeadersFn
+        )
+        if response.status_code == 200:
+            self.commonDefaults.set_default_string_value(version_default_name, version)
+            self.commonDefaults.set_default_string_value(maxrows_default_name, maxrows)
+            self.commonDefaults.set_default_string_value(offset_default_name, offset)
+            self.commonDefaults.set_default_string_value(criteria_string_default_name, criteria_text)
+
+        if response.status_code != 200:
+            print("Error response:")
+            print(" status", response.status_code)
+            print(" text", response.text)
+        else:
+            print("OK response")
+            responseJSON = json.loads(response.text)
+            print("Rows returned:", len(responseJSON))
+            for row in responseJSON:
+                print(row)
+                print("--")
