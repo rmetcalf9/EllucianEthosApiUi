@@ -16,6 +16,9 @@ resource_list = {
     "addresses": {
         "default_version_to_set": None
     },
+    "address-types": {
+        "default_version_to_set": None
+    },
     "alternative-credential-types": {
         "default_version_to_set": None
     },
