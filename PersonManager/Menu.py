@@ -46,17 +46,17 @@ class Menu(SubMenuEthosBaseClass):
 
         skipVerification = inquirer.confirm(
             message="Do you want to skip verification?",
-            default=True
+            default=False
         ).execute()
 
         skipUpdate = inquirer.confirm(
             message="Do you want to skip update?",
-            default=True
+            default=False
         ).execute()
 
         skipCreate = inquirer.confirm(
             message="Do you want to skip create?",
-            default=True
+            default=False
         ).execute()
 
 
@@ -68,6 +68,8 @@ class Menu(SubMenuEthosBaseClass):
             last_name = None
         if dob == "":
             dob = None
+
+        guid_for_ethnicity_from_greenwich = "8ccedd09-a256-4d89-97c5-4b950780af3c"
 
         params = {}
         data = {
@@ -89,7 +91,12 @@ class Menu(SubMenuEthosBaseClass):
                         "middleName": middle_name,
                         "lastName": last_name,
                     }
-                ]
+                ],
+                "ethnicities": [{
+                    "ethnicGroup": {
+                        "id": guid_for_ethnicity_from_greenwich
+                    }
+                }]
             }
         }
 
