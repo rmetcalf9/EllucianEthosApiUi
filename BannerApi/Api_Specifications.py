@@ -34,6 +34,8 @@ class ApiSpecificationsMenu():
             "Clone spec to local Library": self.opt_clone_logic_specification,
             "Validate Spec in Library": self.opt_validate_specification,
             "Deploy spec from local Library": self.opt_deploy_full_specification,
+            "Turn validation on/off": self.opt_switch_validation,
+            "Activate or Deactivate": self.opt_switch_activation,
             "Delete custom API spec": self.opt_delete_api_specification
         }
         operation_list = []
@@ -347,4 +349,47 @@ class ApiSpecificationsMenu():
             raise Exception("Error deleting spec")
 
         print("Delete successful")
+
+    def opt_switch_validation(self):
+        print("TODO")
+
+    def opt_switch_activation(self):
+        api_spec = self._select_api_specification(msg="Select api spec to change activation status")
+        possible_status_values = ["test", "enabled", "disabled"]
+        print("Current activation status of this API is:", api_spec["status"])
+        if api_spec["status"] in possible_status_values:
+            possible_status_values.remove(api_spec["status"])
+        choices = []
+        for x in possible_status_values:
+            choices.append(Choice(value=x, name=x))
+        new_status = inquirer.select(
+            message="Select status to switch " + api_spec["resource"] + " to:",
+            choices=choices,
+            default=possible_status_values[0],
+            height=8
+        ).execute()
+
+        put_request_body = {
+            "id": api_spec["id"],
+            "resource": api_spec["resource"],
+            "status": new_status
+        }
+
+        def injectHeadersEndpointFn(headers):
+            headers["Accept"] = "application/json"
+            headers["Content-type"] = "application/json"
+        response = self.bannerClient.sendPutRequest(
+            url=base_url + "/" + api_spec["id"],
+            loginSession=self.loginSession,
+            data=json.dumps(put_request_body),
+            injectHeadersFn=injectHeadersEndpointFn
+        )
+        if response.status_code != 200:
+            print("Status:", response.status_code)
+            print("Text:", response.text)
+            raise Exception("Error sending PUT request")
+        print("Success 200 returned")
+        print(response.text)
+        print("")
+
 
