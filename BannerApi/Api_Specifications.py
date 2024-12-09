@@ -285,6 +285,9 @@ class ApiSpecificationsMenu():
             print("Status:", put_endpoint_response.status_code)
             print("Text:", put_endpoint_response.text)
             raise Exception("Error sending PUT request for endpoint")
+        print("PUT Endpoint Success 200 returned")
+        print(put_endpoint_response.text)
+        print("")
 
         def injectHeadersResourceFn(headers):
             headers["Accept"] = resource_spec_content_type
@@ -299,6 +302,9 @@ class ApiSpecificationsMenu():
             print("Status:", put_resource_response.status_code)
             print("Text:", put_resource_response.text)
             raise Exception("Error sending PUT request for resource")
+        print("PUT resource Success 200 returned")
+        print(put_resource_response.text)
+        print("")
 
         def injectHeadersLogicFn(headers):
             headers["Accept"] = logic_spec_content_type
@@ -315,6 +321,9 @@ class ApiSpecificationsMenu():
             print("Error sending PUT request for logic")
             return
             #raise Exception("Error sending PUT request for logic")
+        print("PUT logic Success 200 returned")
+        print(put_logic_response.text)
+        print("")
 
         print("Spec deployed")
 
