@@ -1,6 +1,7 @@
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
+from BannerApi.ApiSpecLibrary import ApiSpecLibrary
 
 
 resource_list = {
@@ -33,6 +34,24 @@ resource_list = {
     }
 }
 
+def select_custom_resource():
+    operation_list = []
+    api_spec_library = ApiSpecLibrary()
+    for resource in api_spec_library.get_resource_name_list():
+        operation_list.append(Choice(value=resource, name=resource))
+    action = inquirer.select(
+        message="Select a custom resource:",
+        choices=operation_list,
+        default="Logout",
+    ).execute()
+    return {
+        "name": action,
+        "opts": {
+            "default_version_to_set": None
+        }
+    }
+
+
 
 def select_resource():
     operation_list = []
@@ -40,6 +59,7 @@ def select_resource():
         operation_list.append(Choice(value=resource, name=resource))
     operation_list.append(Separator())
     operation_list.append(Choice(value="Other", name="Other"))
+    operation_list.append(Choice(value="Custom", name="Custom"))
 
     action = inquirer.select(
         message="Select a resource:",
@@ -54,6 +74,8 @@ def select_resource():
                 "default_version_to_set": None
             }
         }
+    if action == "Custom":
+        return select_custom_resource()
 
     return {
         "name": action,

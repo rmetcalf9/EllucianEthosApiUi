@@ -8,10 +8,12 @@ logic_filename = "/logic.json"
 
 class ApiSpecLibrary():
     library_path = None
-    def __init__(self, library_path="./banner_api_spec_library"):
-        self.library_path = library_path
-        if not os.path.isdir(library_path):
-            os.makedirs(library_path)
+    def __init__(self):
+        # in future should be read from setting
+        library_path_from_setting = "./banner_api_spec_library"
+        self.library_path = library_path_from_setting
+        if not os.path.isdir(self.library_path):
+            os.makedirs(self.library_path)
 
     def getSpec(self, resource_name, resource_version):
         return ApiSpecLibraryItem(self.library_path, resource_name, resource_version)
