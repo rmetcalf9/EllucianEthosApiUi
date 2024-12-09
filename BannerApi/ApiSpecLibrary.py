@@ -119,14 +119,20 @@ class ApiSpecLibraryItem():
 
             for method in endpoint_dict["paths"][path]:
                 resource_tag_found = False
-                for tag in endpoint_dict["paths"][path][method]["tags"]:
-                    if tag == self.resource_name:
-                        resource_tag_found = True
-                if not resource_tag_found:
+                if "tags" not in endpoint_dict["paths"][path][method]:
                     retVal.append(SpecValidationError(
                         endpoint_filename,
-                        "Path " + path + " method " + method + " should have a tag " + self.resource_name + " (Actual: " + str(endpoint_dict["paths"][path][method]["tags"]) + ")"
+                        "Path " + path + " method " + method + " should have a tag " + self.resource_name + " but 'tags' element present)"
                     ))
+                else:
+                    for tag in endpoint_dict["paths"][path][method]["tags"]:
+                        if tag == self.resource_name:
+                            resource_tag_found = True
+                    if not resource_tag_found:
+                        retVal.append(SpecValidationError(
+                            endpoint_filename,
+                            "Path " + path + " method " + method + " should have a tag " + self.resource_name + " (Actual: " + str(endpoint_dict["paths"][path][method]["tags"]) + ")"
+                        ))
 
         if endpoint_dict["info"]["title"] != self.resource_name:
             retVal.append(SpecValidationError(
