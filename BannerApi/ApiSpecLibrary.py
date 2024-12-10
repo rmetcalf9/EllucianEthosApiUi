@@ -154,6 +154,22 @@ class ApiSpecLibraryItem():
         if logic_dict["resource"] != self.resource_name:
             retVal.append(SpecValidationError(logic_filename, "Resource should be " + self.resource_name + " (Actual: " + logic_dict["resource"] + ")"))
 
+        for segment in logic_dict["segments"]:
+            if "name" not in segment:
+                retVal.append(SpecValidationError(
+                    logic_filename,
+                    "segment missing name tag)"
+                ))
+            else:
+                enforceContextResourceName = False
+                if enforceContextResourceName:
+                    if "contextResourceName" in segment["config"]:
+                        if segment["config"]["contextResourceName"] != self.resource_name:
+                            retVal.append(SpecValidationError(
+                                logic_filename,
+                                "segment:" + segment["name"] + " config/contextResourceName should be " + self.resource_name + " (Actual: " + segment["config"]["contextResourceName"] + ")"
+                            ))
+
         return retVal
 
     def _get_resource_validation_errors(self):

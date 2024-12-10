@@ -36,7 +36,7 @@ class ApiSpecificationsMenu():
             "Deploy spec from local Library": self.opt_deploy_full_specification,
             "Turn validation on/off": self.opt_switch_validation,
             "Activate or Deactivate": self.opt_switch_activation,
-            "Delete custom API spec": self.opt_delete_api_specification
+            "Delete custom API spec from server": self.opt_delete_api_specification
         }
         operation_list = []
         for operation in operations:
@@ -196,7 +196,10 @@ class ApiSpecificationsMenu():
         return retVal
 
     def opt_validate_specification(self):
-        spec = self._get_spec_from_library()
+        spec = self._get_spec_from_library(
+            res_msg="Select resource to validate",
+            ver_msg="Select major version of resource to validate"
+        )
         if spec is None:
             print("No resources in library")
             return
