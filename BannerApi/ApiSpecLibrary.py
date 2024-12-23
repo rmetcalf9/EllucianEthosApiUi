@@ -27,7 +27,8 @@ class ApiSpecLibrary():
     def get_major_versions_for_resource(self, resource_name):
         retVal = []
         for x in os.listdir(self.library_path + "/" + resource_name):
-            retVal.append(x)
+            if os.path.isdir(self.library_path + "/" + resource_name + "/" + x):
+                retVal.append(x)
         return retVal
 
 class SpecValidationError():
