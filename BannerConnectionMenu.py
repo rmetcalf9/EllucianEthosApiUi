@@ -51,7 +51,7 @@ class BannerConnectionMenu():
                 return F
 
             first_connection = None
-            print("self conns IN LOOP", self.connections)
+            ###print("self conns IN LOOP", self.connections) SECURITY THIS WILL OUTPUT PASSWORD TO SCREEN
             for connection in self.connections:
                 prompt_string = "Connect to " + connection
                 if first_connection is None:
