@@ -39,6 +39,9 @@ def select_custom_resource():
     api_spec_library = ApiSpecLibrary()
     for resource in api_spec_library.get_resource_name_list():
         operation_list.append(Choice(value=resource, name=resource))
+    if len(operation_list) == 0:
+        print("There are no custom resources")
+        return None
     action = inquirer.select(
         message="Select a custom resource:",
         choices=operation_list,
@@ -59,7 +62,9 @@ def select_resource():
         operation_list.append(Choice(value=resource, name=resource))
     operation_list.append(Separator())
     operation_list.append(Choice(value="Other", name="Other"))
-    operation_list.append(Choice(value="Custom", name="Custom"))
+    api_spec_library = ApiSpecLibrary()
+    if len(api_spec_library.get_resource_name_list())>0:
+        operation_list.append(Choice(value="Custom", name="Custom"))
 
     action = inquirer.select(
         message="Select a resource:",

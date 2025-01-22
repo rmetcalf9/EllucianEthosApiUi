@@ -1,3 +1,5 @@
+from json import JSONDecodeError
+
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
@@ -34,6 +36,7 @@ class LoggedInMenu():
             "Get Resource using criteria": self.opt_get_resource_using_criteria,
             "Get Resource List": self.opt_get_resource_list,
             "Get Person by name": self.opt_get_person_by_name,
+            "Update Resource": self.opt_update_resource,
             "Graph QL": self.opt_graph_ql,
             "Business Process API": self.opt_bpapi,
             "Performance Tests": self.opt_performance,
@@ -220,6 +223,13 @@ class LoggedInMenu():
                 print(row)
                 print("--")
 
+    def array_value_or_none(self, array, key):
+        if key not in array:
+            return "None"
+        if array[key] is None:
+            return "None"
+        return array[key]
+
     def opt_appconfig(self):
         response = self.ethosClient.sendGetRequest(url="/appconfig", loginSession=self.loginSession)
         if response.status_code != 200:
@@ -228,10 +238,10 @@ class LoggedInMenu():
             print(" text", response.text)
         else:
             obj = json.loads(response.text)
-            print("ID:", obj["id"])
-            print("Name:", obj["name"])
-            print("Metadata:", obj["metadata"])
-            print("Description:", obj["description"])
+            print("ID:", self.array_value_or_none(obj, "id"))
+            print("Name:", self.array_value_or_none(obj, "name"))
+            print("Metadata:", self.array_value_or_none(obj, "metadata"))
+            print("Description:", self.array_value_or_none(obj, "description"))
             if "subscriptions" in obj:
                 print("# subscriptions:", len(obj["subscriptions"]))
             else:
@@ -340,3 +350,44 @@ class LoggedInMenu():
             for row in responseJSON:
                 print(row)
                 print("--")
+
+    def opt_update_resource(self):
+        resource = EllucianCommonUtils.select_resource()
+        if resource is None:
+            return
+        def injectHeadersFn(headers):
+            headers["Content-Type"] = "application/json"
+
+        params={}
+
+        bodyJson = None
+        bodyText = ""
+        while bodyJson is None:
+            bodyText = inquirer.text(
+                message="Enter JSON Data:",
+                default=bodyText
+            ).execute()
+            if bodyText == "":
+                print("No json entered - aborting")
+                return
+
+            try:
+                bodyJson = json.loads(bodyText)
+            except JSONDecodeError:
+                print("Invalid JSON")
+                bodyJson = None
+
+        response = self.ethosClient.sendPutRequest(
+            url="/api/" + resource["name"],
+            loginSession=self.loginSession,
+            params=params,
+            data=json.dumps(bodyJson),
+            injectHeadersFn=injectHeadersFn
+        )
+        if response.status_code != 999:
+            print("Error response:")
+            print(" status", response.status_code)
+            print(" text", response.text)
+
+
+        print("TODO", resource)
