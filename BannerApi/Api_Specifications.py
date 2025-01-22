@@ -241,8 +241,14 @@ class ApiSpecificationsMenu():
 
         print("Selected resource to deploy:", spec.get_text())
 
+        delete_first = False
         if found_resource:
             print("Resource has been deployed - will overwrite")
+            delete_first = inquirer.confirm(
+                    message="Do you want to delete the api before deploying?",
+                    default=False
+            ).execute()
+            print("Run delete first:", delete_first)
         else:
             print("This resource is not yet deployed - will create new deployment")
 
@@ -252,6 +258,20 @@ class ApiSpecificationsMenu():
                 default=False
         ).execute():
             return
+
+        if delete_first:
+            response = self.bannerClient.sendDeleteRequest(
+                url=base_url + "/" + found_resource["id"],
+                loginSession=self.loginSession,
+                injectHeadersFn=None
+            )
+            if response.status_code != 200:
+                print("Status:", response.status_code)
+                print("Text:", response.text)
+                raise Exception("Error deleting spec")
+            print("Delete complete")
+            found_resource = None
+
 
         if not found_resource:
             def injectHeadersFn(headers):
