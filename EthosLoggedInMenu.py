@@ -115,16 +115,22 @@ class LoggedInMenu():
         ).execute()
 
 
-        resource_val = self.ethosClient.getResource(
-            loginSession=self.loginSession,
-            resourceName=resource["name"],
-            resourceID=resourceID,
-            version=resource["opts"]["default_version_to_set"]
-        )
-        if  resource_val is not None:
-            self.commonDefaults.set_default_string_value(resourceID_default_name, resourceID)
+        while True:
+            resource_val = self.ethosClient.getResource(
+                loginSession=self.loginSession,
+                resourceName=resource["name"],
+                resourceID=resourceID,
+                version=resource["opts"]["default_version_to_set"]
+            )
+            if  resource_val is not None:
+                self.commonDefaults.set_default_string_value(resourceID_default_name, resourceID)
 
-        self._output_resource(resource_val)
+            self._output_resource(resource_val)
+            if not inquirer.confirm(
+                message="Repeat?",
+                default=False
+            ).execute():
+                return
 
     def opt_get_person_by_name(self):
         resource = EllucianCommonUtils.resource_list["persons"]
