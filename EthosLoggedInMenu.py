@@ -116,16 +116,22 @@ class LoggedInMenu():
 
 
         while True:
-            resource_val = self.ethosClient.getResource(
-                loginSession=self.loginSession,
-                resourceName=resource["name"],
-                resourceID=resourceID,
-                version=resource["opts"]["default_version_to_set"]
-            )
-            if  resource_val is not None:
-                self.commonDefaults.set_default_string_value(resourceID_default_name, resourceID)
+            try:
+                resource_val = self.ethosClient.getResource(
+                    loginSession=self.loginSession,
+                    resourceName=resource["name"],
+                    resourceID=resourceID,
+                    version=resource["opts"]["default_version_to_set"]
+                )
+                if  resource_val is not None:
+                    self.commonDefaults.set_default_string_value(resourceID_default_name, resourceID)
 
-            self._output_resource(resource_val)
+                self._output_resource(resource_val)
+            except APIClientException as err:
+                print("APICLIENTException raised")
+                print(err)  # for the repr
+                print(str(err))  # for just the message
+                print(err.args)  # the arguments that the exception has been called with.
             if not inquirer.confirm(
                 message="Repeat?",
                 default=False
