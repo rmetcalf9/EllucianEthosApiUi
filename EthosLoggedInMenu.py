@@ -82,26 +82,33 @@ class LoggedInMenu():
         if resource is None:
             return
 
-        resourceItemsIterator = self.ethosClient.getResourceIterator(
-            loginSession=self.loginSession,
-            resourceName=resource["name"],
-            params=None,
-            version=resource["opts"]["default_version_to_set"],
-            pageSize=5
-        )
+        while True:
+            resourceItemsIterator = self.ethosClient.getResourceIterator(
+                loginSession=self.loginSession,
+                resourceName=resource["name"],
+                params=None,
+                version=resource["opts"]["default_version_to_set"],
+                pageSize=6
+            )
 
-        max = 5
-        cur = 0
-        try:
-            for resource_item in resourceItemsIterator:
-                print("Result " + str(cur), resource_item.dict)
-                cur += 1
-                if cur > max:
-                    break
-        except APIClientException as err:
-            print("Exception occured")
-            print(err.getDescriptionString())
-            return
+            max = 5
+            cur = 0
+            try:
+                for resource_item in resourceItemsIterator:
+                    print("Result " + str(cur), resource_item.dict)
+                    cur += 1
+                    if cur > max:
+                        break
+            except APIClientException as err:
+                print("Exception occured")
+                print(err.getDescriptionString())
+
+            if not inquirer.confirm(
+                message="Repeat?",
+                default=False
+            ).execute():
+                return
+
 
     def opt_get_resource(self):
         resource = EllucianCommonUtils.select_resource()
