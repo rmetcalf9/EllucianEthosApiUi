@@ -36,6 +36,7 @@ class LoggedInMenu():
             "Get Resource using criteria": self.opt_get_resource_using_criteria,
             "Get Resource List": self.opt_get_resource_list,
             "Get Person by name": self.opt_get_person_by_name,
+            "Create Resource": self.opt_create_resource,
             "Update Resource": self.opt_update_resource,
             "Graph QL": self.opt_graph_ql,
             "Business Process API": self.opt_bpapi,
@@ -370,7 +371,71 @@ class LoggedInMenu():
                 print(row)
                 print("--")
 
+    def _get_json_input(self):
+        bodyText = ""
+        bodyJson = None
+        while bodyJson is None:
+            bodyText = inquirer.text(
+                message="Enter JSON Data:",
+                default=bodyText
+            ).execute()
+            if bodyText == "":
+                print("No json entered - aborting")
+                return None
+
+            try:
+                bodyJson = json.loads(bodyText)
+            except JSONDecodeError:
+                print("Invalid JSON")
+                bodyJson = None
+        return bodyJson
+
     def opt_update_resource(self):
+        resource = EllucianCommonUtils.select_resource()
+        if resource is None:
+            return
+
+        resourceID_default_name = "opt_update_resource_" + resource["name"] + "_resourceID"
+        resourceID = inquirer.text(
+            message="Enter resource ID:",
+            default=self.commonDefaults.get_default_string_value(resourceID_default_name)
+        ).execute()
+
+        def injectHeadersFn(headers):
+            headers["Content-Type"] = "application/json"
+
+        params={}
+
+        bodyJson = self._get_json_input()
+        if bodyJson is None:
+            return
+
+        while True:
+            response = self.ethosClient.sendPutRequest(
+                url="/api/" + resource["name"] + "/" + resourceID,
+                loginSession=self.loginSession,
+                params=params,
+                data=json.dumps(bodyJson),
+                injectHeadersFn=injectHeadersFn
+            )
+            if response.status_code != 200:
+                print("Error response:")
+                print(" status", response.status_code)
+                print(" text", response.text)
+            else:
+                print("TODO Success output")
+
+            if not inquirer.confirm(
+                message="Repeat?",
+                default=False
+            ).execute():
+                break
+
+        if response.status_code != 200:
+            self.commonDefaults.set_default_string_value(resourceID_default_name, resourceID)
+
+
+    def opt_create_resource(self):
         resource = EllucianCommonUtils.select_resource()
         if resource is None:
             return
@@ -379,34 +444,22 @@ class LoggedInMenu():
 
         params={}
 
-        bodyJson = None
-        bodyText = ""
-        while bodyJson is None:
-            bodyText = inquirer.text(
-                message="Enter JSON Data:",
-                default=bodyText
-            ).execute()
-            if bodyText == "":
-                print("No json entered - aborting")
-                return
+        bodyJson = self._get_json_input()
+        if bodyJson is None:
+            return
 
-            try:
-                bodyJson = json.loads(bodyText)
-            except JSONDecodeError:
-                print("Invalid JSON")
-                bodyJson = None
-
-        response = self.ethosClient.sendPutRequest(
+        response = self.ethosClient.sendPostRequest(
             url="/api/" + resource["name"],
             loginSession=self.loginSession,
             params=params,
             data=json.dumps(bodyJson),
             injectHeadersFn=injectHeadersFn
         )
-        if response.status_code != 999:
+        if response.status_code != 200:
             print("Error response:")
             print(" status", response.status_code)
             print(" text", response.text)
+            return
 
 
         print("TODO", resource)
