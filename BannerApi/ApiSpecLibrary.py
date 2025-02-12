@@ -163,6 +163,8 @@ class ApiSpecLibraryItem():
                 ))
             else:
                 enforceContextResourceName = False
+                if segment["name"] == "getResource":
+                    enforceContextResourceName = True
                 if enforceContextResourceName:
                     if "contextResourceName" in segment["config"]:
                         if segment["config"]["contextResourceName"] != self.resource_name:
