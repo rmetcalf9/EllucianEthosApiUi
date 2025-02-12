@@ -75,7 +75,7 @@ class LoggedInMenu():
             print(" resourceID:", resource_val.resourceID )
             print(" version :", resource_val.version )
             print(" data")
-            print(resource_val.dict)
+            print(json.dumps(resource_val.dict))
             print("")
 
     def opt_get_resource_list(self):
