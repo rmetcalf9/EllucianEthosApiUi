@@ -96,7 +96,7 @@ class LoggedInMenu():
             cur = 0
             try:
                 for resource_item in resourceItemsIterator:
-                    print("Result " + str(cur), resource_item.dict)
+                    print("Result " + str(cur), json.dumps(resource_item.dict))
                     cur += 1
                     if cur > max:
                         break
